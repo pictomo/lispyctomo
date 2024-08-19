@@ -15,7 +15,7 @@ class Env(dict):
         elif self.outer:
             return self.outer.find(key)
         else:
-            raise Exception("{key} is not found. @Env.find()")
+            raise Exception(f"{key} is not found. @Env.find()")
 
 
 import math, operator as op
@@ -90,7 +90,7 @@ def eval(exp, env=global_env):
             if not key in env:
                 env[key] = eval(value)
             else:
-                raise Exception("{key} is already defined. @eval()")
+                raise Exception(f"{key} is already defined. @eval()")
             return
 
         elif exp[0] == "set!":
@@ -169,12 +169,22 @@ def tokenize(chars):
 
 # read-eval-print loop
 def repl():
+    tokens = []
     while True:
         val = input("lispyctomo> ")
-        tokens = tokenize(val)
-        syntax_tree = parse(tokens)
-        print(syntax_tree)
-        eval(syntax_tree, global_env)
+        tokens.extend(tokenize(val))
+        bracket_num = 0
+        for index, token in enumerate(tokens):
+            if token == "(":
+                bracket_num += 1
+            elif token == ")":
+                bracket_num -= 1
+            if bracket_num == 0:
+                syntax_tree = parse(tokens[: index + 1])
+                tokens = tokens[index + 1 :]
+                print(syntax_tree)
+                eval(syntax_tree, global_env)
+                break
 
 
 if __name__ == "__main__":
