@@ -1,1 +1,9 @@
+# dev utility
 test*.py
+
+# common
+.env
+
+# python
+__pycache__/
+venv/

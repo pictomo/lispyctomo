@@ -182,7 +182,7 @@ def repl():
             if bracket_num == 0:
                 syntax_tree = parse(tokens[: index + 1])
                 tokens = tokens[index + 1 :]
-                print(syntax_tree)
+                # print(syntax_tree)
                 eval(syntax_tree, global_env)
                 break
 
