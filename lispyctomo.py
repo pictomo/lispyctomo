@@ -63,12 +63,12 @@ def eval(exp, env=global_env):
     elif not isinstance(exp, list):  # リテラル
         return exp
 
-    elif len(exp) == 0:  # nullリスト
-        return  # これでいい?
-
     else:
+        child_env = Env(outer=env)
+        if len(exp) == 0:  # nullリスト
+            return  # これでいい?
         # 組み込み構文
-        if exp[0] == "quote":
+        elif exp[0] == "quote":
             _, *cdr = exp
             return cdr
 
@@ -88,7 +88,7 @@ def eval(exp, env=global_env):
         elif exp[0] == "define":
             _, key, value = exp
             if not key in env:
-                env[key] = eval(value)
+                env[key] = eval(value, env)
             else:
                 raise Exception(f"{key} is already defined. @eval()")
             return
@@ -105,14 +105,14 @@ def eval(exp, env=global_env):
             def arrow_func(*args):
                 if len(args) != len(params):
                     raise Exception("Invalid number of arguments. @eval()")
-                return eval(body, Env(zip(params, args), outer=env))
+                return eval(body, child_env.update(zip(params, args)))
 
             return arrow_func
 
         elif exp[0] == "begin":
             _, *child_exps = exp
             for child_exp in child_exps:
-                val = eval(child_exp, env)
+                val = eval(child_exp, child_env)
             return val
 
         # elif exp[0] == "":
